@@ -1,0 +1,11 @@
+Flask~=2.0.1
+Flask-WTF
+flask-sqlalchemy
+flask-bootstrap
+flask-nav
+Flask-FontAwesome
+pymysql
+WTForms~=2.3.3
+SQLAlchemy~=1.4.23
+Werkzeug~=2.0.1
+cryptography
