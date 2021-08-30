@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" type="text/css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css">
+{% endblock %}
+{% block app_content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 ">
+                <h1>Contatos</h1>
+                <ul id="ulist" class="list-group">
+                {% for contato in contatos %}
+                    <h3>
+                        <a idContato={{ contato.idContato }} onclick="EditarContato(this)">
+                            <span class="fas fa-user-edit"></span></a>
+                        {{ contato.nome }}
+                    </h3>
+                    <p>Data de nascimento: {{ contato.dataNasc.strftime('%d/%m/%Y') }}</p>
+                    <span class="fas fa-plus-square" onclick="AdicionarTelefone(this)"></span>
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Rótulo</th>
+                            <th>Número</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        {% for tel in contato.telefone_collection %}
+                            <tr>
+                                <td>{{ tel.rotulo }}</td>
+                                <td>{{ tel.numero }}</td>
+                                <td>
+                                    <a idTelefone={{ tel.idTelefone }} onclick="Excluir(this)" ><span class="fas fa-trash-alt"></span></a>
+                                </td>
+                            </tr>
+
+
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {# Diálogo para edição de contato #}
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                            class="sr-only">Fechar</span></button>
+                    <h4 class="modal-title" id="editModalLabel">Atualizar contato</h4>
+                </div>
+                <div class="modal-body">
+                    <form role="form">
+                        {{ wtf.form_field(form.idContato) }}
+                        {{ wtf.form_field(form.nome) }}
+                        {{ wtf.form_field(form.dataNasc) }}
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    {{ wtf.form_field(form.btnAtualizar) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Diálogo para confirmar exclusão de telefone #}
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="text-align:center;">
+                    <h4>Você realmente deseja excluir?</h4>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="Delete()">Confirmar</button>
+                </div>
+            </div>
+        </div>
+</div>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+    function EditarContato(elm) {
+    $.ajax({
+        url: '/contato',
+        data: {
+            id: $(elm).attr('idContato')
+        },
+        type: 'POST',
+        success: function(res) {
+            //povoar o form
+             $('#idContato').val(res['id']);
+            $('#nome').val(res['nome']);
+            $('#dataNasc').val(res['dataNasc']);
+
+            // exibindo o popup
+            $('#editModal').modal();
+
+            console.log(res);
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+    }
+
+    $(function(){
+          $('#btnAtualizar').click(function(){
+            $.ajax({
+              url : '/atualizarcontato',
+              data : {idContato : $('#idContato').val(),nome: $('#nome').val(),dataNasc: $('#dataNasc').val()},
+              type : 'POST',
+              success: function(res){
+                $('#editModal').modal('hide');
+                location.reload();
+              },
+              error: function(error){
+                console.log(error);
+              }
+            });
+          });
+      });
+
+
+    function Excluir(elm){
+        $('#deleteModal').modal();
+    }
+
+    function Delete(){
+        $('#deleteModal').modal('hide');
+        alert("Preciso ser implementado")
+    }
+
+    function AdicionarTelefone(){
+        {#Vai ser muito parecido com a lógica do editar Contato#}
+        alert("Preciso ser implementado")
+    }
+
+    </script>
+
+{% endblock %}
+
+
+

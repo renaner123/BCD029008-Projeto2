@@ -1,0 +1,38 @@
+{% extends 'bootstrap/base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('.static', filename='estilo.css') }}">
+{% endblock %}
+{% block html_attribs %} lang="pt_BR"{% endblock %}
+
+{% if title %}
+    <title>Aplicação Web {{ title }}</title>
+{% else %}
+    <title>Aplicação Web</title>
+{% endif %}
+
+{% block content %}
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="container login-container">
+            <div class="row">
+                <div class="col-md-6 login-form">
+                    <h3>Autenticação</h3>
+                    <div class="form-group">
+                        {{ wtf.quick_form(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+</html>

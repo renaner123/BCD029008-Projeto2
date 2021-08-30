@@ -1,0 +1,51 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block styles %}
+    {{ super() }}
+    {{ fontawesome_html() }}
+    <link rel=icon href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14/svgs/solid/rocket.svg>
+    <link rel="stylesheet" href="{{ url_for('.static', filename='estilo.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.min.css">
+{% endblock %}
+{% block html_attribs %} lang="pt_BR"{% endblock %}
+
+{% if title %}
+    <title>Aplicação Web {{ title }}</title>
+{% else %}
+    <title>Aplicação Web</title>
+{% endif %}
+{% block navbar %}
+    {{ nav.meunavbar.render() }}
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {# Conteúdo das páginas ficarão aqui #}
+
+        {% block app_content %} {% endblock %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $('#dataNasc').datepicker({
+          format: 'dd/mm/yyyy',
+      });
+    });
+  </script>
+{% endblock %}
+
+</html>

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block app_content %}
+     {% block jumbotron %}
+        <div class="jumbotron">
+            <h2>Página não encontrada</h2>
+            <h3>Por favor, verifique se forneceu os dados corretos.</h3>
+            <p><a href="{{ url_for('inicio') }}">voltar para a página inicial</a>
+        </div>
+    {% endblock jumbotron %}
+{% endblock %}
