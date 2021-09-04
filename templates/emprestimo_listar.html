@@ -8,12 +8,18 @@
 {% block app_content %}
     <div class="container">
         <div class="row">
+
+            <div id="dialog" title="Basic dialog">
+
+            </div>
             <div class="col-md-6 ">
                 <h1>Emprestimos</h1>
                 <ul id="ulist" class="list-group">
+
                 {% for emprestimo in emprestimos %}
                     <h4>
-                        Emprestimo {{ emprestimo.idEmprestimo }}<a idEmprestimo={{ emprestimo.idEmprestimo }} onclick="EditarContato(this)">
+                        Emprestimo {{ emprestimo.idEmprestimo }} <a idEmprestimo={{ emprestimo.idEmprestimo }},
+                            matricula={{ emprestimo.matricula }}, onclick="EditarContato(this)">
                             <span class="glyphicon glyphicon-edit"></span></a>
                     </h4>
 
@@ -67,12 +73,13 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
                             class="sr-only">Fechar</span></button>
-                    <h4 class="modal-title" id="editModalLabel">Atualizar contato</h4>
+                    <h4 class="modal-title" id="editModalLabel">Atualizar emprestimo</h4>
                 </div>
                 <div class="modal-body">
-                    <form role="form">
-                        {{ wtf.form_field(form.idEmprestimo) }}
-                    </form>
+                    <form role="form">#}
+{#                        {{ wtf.form_field(form.idEmprestimo) }}#}
+{#                        {{ wtf.form_field(form.matricula) }}#}
+                    </form>#}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
@@ -107,17 +114,17 @@
     {{ super() }}
     <script>
     function EditarContato(elm) {
+
     $.ajax({
-        url: '/contato',
+        url: '/emprestimo/renovar',
+        dataType: "json",
         data: {
-            id: $(elm).attr('idContato')
+            idEmprestimo: $(elm).attr('idEmprestimo').slice(0,-1),
+            matricula: $(elm).attr('matricula').slice(0,-1)
         },
         type: 'POST',
         success: function(res) {
             //povoar o form
-             $('#idContato').val(res['id']);
-            $('#nome').val(res['nome']);
-            $('#dataNasc').val(res['dataNasc']);
 
             // exibindo o popup
             $('#editModal').modal();
@@ -133,8 +140,8 @@
     $(function(){
           $('#btnAtualizar').click(function(){
             $.ajax({
-              url : '/atualizarcontato',
-              data : {idContato : $('#idContato').val(),nome: $('#nome').val(),dataNasc: $('#dataNasc').val()},
+              url : '/emprestimo/renovar',
+              data : {idEmprestimo : $('#idEmprestimo').val(),matricula: $('#matricula').val()},
               type : 'POST',
               success: function(res){
                 $('#editModal').modal('hide');

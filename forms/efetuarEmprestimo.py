@@ -5,4 +5,5 @@ class EfetuarEmprestimoForm(FlaskForm):
     idEmprestimo = HiddenField('idEmprestimo')
     matricula = IntegerField('matricula',[validators.DataRequired()])
     idEquipamento = IntegerField('idEquipamento',[validators.DataRequired()])
+    idAtividade = IntegerField('idAtividade',[validators.DataRequired()])
     btnAtualizar = SubmitField('Confirmar')
