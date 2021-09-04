@@ -7,6 +7,7 @@
 {% endblock %}
 {% block app_content %}
     <div class="container">
+
         <div class="row">
 
             <div id="dialog" title="Basic dialog">
@@ -18,16 +19,17 @@
 
                 {% for emprestimo in emprestimos %}
                     <h4>
-                        Emprestimo {{ emprestimo.idEmprestimo }} <a idEmprestimo={{ emprestimo.idEmprestimo }},
+                        Renovar emprestimo <a idEmprestimo={{ emprestimo.idEmprestimo }},
                             matricula={{ emprestimo.matricula }}, onclick="EditarContato(this)">
                             <span class="glyphicon glyphicon-edit"></span></a>
                     </h4>
 
 {#                    <p>Data de saída: {{ emprestimo.dataSaida.strftime('%d/%m/%Y') }}</p>#}
 {#                    <span class="fas fa-plus-square" onclick="AdicionarTelefone(this)"></span>#}
-                    <table class="table table-hover">
+                    <table class="table table-hover ">
                         <thead>
                         <tr >
+                            <th>id Emprestimo</th>
                             <th>Data saída</th>
                             <th id="teste">Data Entrega</th>
                             <th>Data Devolução</th>
@@ -40,6 +42,7 @@
                         </thead>
                         <tbody>
                             <tr>
+                                <td class="bg-primary">{{ emprestimo.idEmprestimo }}</td>
                                 <td>{{ emprestimo.dataSaida.strftime('%d/%m/%Y') }}</td>
 
                                 {% if(emprestimo.dataEntrega == None) %}
@@ -53,7 +56,7 @@
                                 <td>{{ emprestimo.idAtividade }}</td>
                                 <td>{{ emprestimo.idEquipamentoEmprestado }}</td>
                                 <td>
-                                    <a idEmprestimo={{ emprestimo.idEmprestimo }} onclick="Excluir(this)" ><span class="fas fa-trash-alt"></span></a>
+                                    <a idEmprestimo={{ emprestimo.idEmprestimo }} onclick="Finalizar(this)" ><span class="fas fa-trash-alt"></span></a>
                                 </td>
                             </tr>
                         </tbody>
@@ -70,19 +73,10 @@
          aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
-                            class="sr-only">Fechar</span></button>
-                    <h4 class="modal-title" id="editModalLabel">Atualizar emprestimo</h4>
-                </div>
-                <div class="modal-body">
-                    <form role="form">#}
-{#                        {{ wtf.form_field(form.idEmprestimo) }}#}
-{#                        {{ wtf.form_field(form.matricula) }}#}
-                    </form>#}
+                <div class="modal-header" style="text-align:center;">
+                    <h4 class="modal-title" id="editModalLabel">Emprestimo renovado</h4>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                     {{ wtf.form_field(form.btnAtualizar) }}
                 </div>
             </div>
@@ -95,11 +89,9 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header" style="text-align:center;">
-                    <h4>Você realmente deseja excluir?</h4>
+                    <h4>Emprestimo finalizado</h4>
                 </div>
-
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary" onclick="Delete()">Confirmar</button>
                 </div>
             </div>
@@ -114,7 +106,7 @@
     {{ super() }}
     <script>
     function EditarContato(elm) {
-
+    {#$('#editModal').modal();#}
     $.ajax({
         url: '/emprestimo/renovar',
         dataType: "json",
@@ -124,50 +116,49 @@
         },
         type: 'POST',
         success: function(res) {
-            //povoar o form
-
-            // exibindo o popup
-            $('#editModal').modal();
-
+            $('#editModal').modal()
             console.log(res);
+            setInterval('refreshPage()', 500);
+        },
+        error: function(error) {
+            console.log(error);
+            setInterval('refreshPage()', 500);
+        }
+    });
+    $(function(elm){
+          $('#btnAtualizar').click(function(){
+              location.reload();
+          });
+    });
+    }
+
+    function Finalizar(elm){
+        $('#deleteModal').modal();
+        $.ajax({
+        url: '/emprestimo/finalizar',
+        dataType: "json",
+        data: {
+            idEmprestimo: $(elm).attr('idEmprestimo'),
+        },
+        type: 'POST',
+        success: function(res) {
+            console.log(res);
+
         },
         error: function(error) {
             console.log(error);
         }
     });
     }
-
-    $(function(){
-          $('#btnAtualizar').click(function(){
-            $.ajax({
-              url : '/emprestimo/renovar',
-              data : {idEmprestimo : $('#idEmprestimo').val(),matricula: $('#matricula').val()},
-              type : 'POST',
-              success: function(res){
-                $('#editModal').modal('hide');
-                location.reload();
-              },
-              error: function(error){
-                console.log(error);
-              }
-            });
-          });
-      });
-
-
-    function Excluir(elm){
-        $('#deleteModal').modal();
-    }
-
     function Delete(){
         $('#deleteModal').modal('hide');
-        alert("Preciso ser implementado")
+        location.reload();
     }
 
-    function AdicionarTelefone(){
-        {#Vai ser muito parecido com a lógica do editar Contato#}
-        alert("Preciso ser implementado")
-    }
+  function refreshPage() {
+    location.reload(true);
+  }
+
 
     </script>
 

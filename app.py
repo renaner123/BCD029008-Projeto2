@@ -1,3 +1,6 @@
+import threading
+import time
+
 from flask import Flask, flash, redirect, url_for, request, session, render_template, jsonify
 from flask_bootstrap import Bootstrap
 from flask_nav import Nav
@@ -5,6 +8,7 @@ from flask_nav.elements import Navbar, View, Subgroup
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.automap import automap_base
 from datetime import datetime, timedelta, date
+
 
 # https://fontawesome.com/icons
 from flask_fontawesome import FontAwesome
@@ -152,7 +156,7 @@ def efetuar_emprestimo():
 def renovar_emprestimo():
     if session.get('logged_in'):
         form = RenovarEmprestimoForm()
-        if form.validate_on_submit():
+        if form.validate_on_submit() or request.form.to_dict() != {}:
             matricula = request.form['matricula']
             idEmprestimo = request.form['idEmprestimo']
 
@@ -166,7 +170,7 @@ def renovar_emprestimo():
                     else:
                         flash(f"Aluno {auxAluno.matricula} não está ativo no curso", category="danger")
                         return redirect(url_for('autenticar'))
-                    if (auxEmprestimo.quantidadeEmprestimo < 3):
+                    if (auxEmprestimo.quantidadeEmprestimo < 30):
                         pass
                     else:
                         flash(f"Emprestimo {idEmprestimo} já foi renovado 3 vezes", category="danger")
@@ -176,7 +180,6 @@ def renovar_emprestimo():
                     else:
                         flash(f"Emprestimo {idEmprestimo} já venceu, não pode renovar", category="danger")
                         return redirect(url_for('autenticar'))
-
                     auxEmprestimo.quantidadeEmprestimo = auxEmprestimo.quantidadeEmprestimo + 1
                     if (int(auxEmprestimo.idAtividade) == 500):
                         dataDevolucao = datetime.now() + timedelta(days=15)
@@ -187,21 +190,22 @@ def renovar_emprestimo():
                     db.session.commit()
                     flash(f"Emprestimo {idEmprestimo} renovado", category="success")
                     return redirect(url_for('autenticar'))
-                flash(f"Aluno {int(matricula)} não é dono do emprestimo {auxEmprestimo.idEmprestimo}",
-                      category="danger")
+                flash(f"Aluno {int(matricula)} não é dono do emprestimo {auxEmprestimo.idEmprestimo}", category="danger")
                 return redirect(url_for('autenticar'))
 
             flash(f"Emprestimo {idEmprestimo} não existe", category="danger")
             return redirect(url_for('autenticar'))
-
     return render_template('renovar_emprestimo.html', title='Renovar emprestimo', form=form)
+
+
 
 
 @app.route('/emprestimo/finalizar', methods=['GET', 'POST'])
 def finalizar_emprestimo():
+    print(request.form)
     if session.get('logged_in'):
         form = FinalizarEmprestimoForm()
-        if form.validate_on_submit():
+        if form.validate_on_submit() or request.form.to_dict() != {}:
             idEmprestimo = request.form['idEmprestimo']
             if (db.session.query(Emprestimo).filter(Emprestimo.idEmprestimo == idEmprestimo).first() is not None):
                 auxEmprestimo = db.session.query(Emprestimo).filter(Emprestimo.idEmprestimo == idEmprestimo).first()
@@ -219,60 +223,16 @@ def finalizar_emprestimo():
 
             flash(f"Emprestimo {idEmprestimo} inválido", category="danger")
             return redirect(url_for('autenticar'))
-    return render_template('finalizar_emprestimo.html', title='Finalizar emprestimo', form=form)
+    return render_template('finalizar_emprestimo.html', title='Finalizar emprestimo', form=form), 200
 
 
-@app.route('/emprestimo')
+@app.route('/emprestimo',methods=['GET', 'POST'])
 def listar_emprestimos():
     if session.get('logged_in'):
         form = EmprestimoForm()
         emprestimos = db.session.query(Emprestimo).filter(Emprestimo.dataEntrega == None)
         return render_template('emprestimo_listar.html', emprestimos=emprestimos, form=form)
     return redirect(url_for('autenticar'))
-
-
-# @app.route('/contato', methods=['POST'])
-# def dados_contato():
-#     if session.get('logged_in'):
-#         id_usuario = session.get('idUsuario')
-#         id_contato = int(request.form['id'])
-#
-#         # https://docs.sqlalchemy.org/en/14/orm/tutorial.html#common-filter-operators
-#         contato = db.session.query(Contato).filter(Contato.idUsuario == id_usuario,
-#                                                    Contato.idContato == id_contato).first()
-#
-#         contado_dict = dict()
-#
-#         contado_dict['id'] = contato.idContato
-#         contado_dict['nome'] = contato.nome
-#         contado_dict['dataNasc'] = contato.dataNasc.strftime('%d/%m/%Y')
-#
-#         return jsonify(contado_dict)
-#
-#     return redirect(url_for('autenticar'))
-
-
-# @app.route('/atualizarcontato', methods=['POST'])
-# def atualizar_contato():
-#     if session.get('logged_in'):
-#         id_usuario = session.get('idUsuario')
-#         id_contato = request.form['idContato']
-#         nome = request.form['nome']
-#         dataNasc = request.form['dataNasc']
-#
-#         contato = db.session.query(Contato).filter(Contato.idUsuario == id_usuario,
-#                                                    Contato.idContato == id_contato).first()
-#
-#         contato.nome = nome
-#         abc = datetime.strptime(dataNasc, '%d/%m/%Y').date()
-#         contato.dataNasc = abc.strftime('%Y-%m-%d')
-#
-#         db.session.commit()
-#
-#         return redirect(url_for('autenticar'))
-#
-#     return redirect(url_for('autenticar'))
-
 
 def criarEmprestimo(matricula, idAtividade, idEquipamento):
     dataAgora = datetime.now()
@@ -314,6 +274,7 @@ class Emprestimo(db.Model):
     matricula = db.Column(db.Integer, nullable=False)
     idAtividade = db.Column(db.Integer, nullable=False)
     idEquipamentoEmprestado = db.Column(db.Integer, nullable=False)
+
 
 
 if __name__ == '__main__':
