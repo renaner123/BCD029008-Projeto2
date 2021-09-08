@@ -17,14 +17,14 @@
                 <h1>Emprestimos</h1>
                 <ul id="ulist" class="list-group">
 
-                {% for emprestimo in emprestimos %}
+                {% for Emprestimo in emprestimos %}
                     <h4>
-                        Renovar emprestimo <a idEmprestimo={{ emprestimo.idEmprestimo }},
-                            matricula={{ emprestimo.matricula }}, onclick="EditarContato(this)">
+                        Renovar emprestimo <a idEmprestimo={{ Emprestimo.idEmprestimo }},
+                            matricula={{ Emprestimo.matricula }}, onclick="EditarContato(this)">
                             <span class="glyphicon glyphicon-edit"></span></a>
                     </h4>
 
-{#                    <p>Data de saída: {{ emprestimo.dataSaida.strftime('%d/%m/%Y') }}</p>#}
+{#                    <p>Data de saída: {{ Emprestimo.dataSaida.strftime('%d/%m/%Y') }}</p>#}
 {#                    <span class="fas fa-plus-square" onclick="AdicionarTelefone(this)"></span>#}
                     <table class="table table-hover ">
                         <thead>
@@ -42,21 +42,21 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="bg-primary">{{ emprestimo.idEmprestimo }}</td>
-                                <td>{{ emprestimo.dataSaida.strftime('%d/%m/%Y') }}</td>
+                                <td class="bg-primary">{{ Emprestimo.idEmprestimo }}</td>
+                                <td>{{ Emprestimo.dataSaida.strftime('%d/%m/%Y') }}</td>
 
-                                {% if(emprestimo.dataEntrega == None) %}
-                                    <td>{{ emprestimo.dataEntrega}}</td>
+                                {% if(Emprestimo.dataEntrega == None) %}
+                                    <td>{{ Emprestimo.dataEntrega}}</td>
                                 {% else %}
-                                    <td>{{ emprestimo.dataEntrega.strftime('%d/%m/%Y') }}</td>
+                                    <td>{{ Emprestimo.dataEntrega.strftime('%d/%m/%Y') }}</td>
                                 {% endif %}
-                                <td>{{ emprestimo.dataDevolucao.strftime('%d/%m/%Y') }}</td>
-                                <td>{{ emprestimo.quantidadeEmprestimo }}</td>
-                                <td>{{ emprestimo.matricula }}</td>
-                                <td>{{ emprestimo.idAtividade }}</td>
-                                <td>{{ emprestimo.idEquipamentoEmprestado }}</td>
+                                <td>{{ Emprestimo.dataDevolucao.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ Emprestimo.quantidadeEmprestimo }}</td>
+                                <td>{{ Emprestimo.matricula }}</td>
+                                <td>{{ Emprestimo.idAtividade }}</td>
+                                <td>{{ Emprestimo.idEquipamentoEmprestado }}</td>
                                 <td>
-                                    <a idEmprestimo={{ emprestimo.idEmprestimo }} onclick="Finalizar(this)" ><span class="fas fa-trash-alt"></span></a>
+                                    <a idEmprestimo={{ Emprestimo.idEmprestimo }} onclick="Finalizar(this)" ><span class="fas fa-trash-alt"></span></a>
                                 </td>
                             </tr>
                         </tbody>
