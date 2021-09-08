@@ -29,7 +29,8 @@ from forms.finalizarEmprestimo import FinalizarEmprestimoForm
 app = Flask(__name__)
 app.secret_key = "SECRET_KEY"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:123456@127.0.0.1:3306/projeto2'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:123456@127.0.0.1:3306/projeto2'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://renan:bcd1234@ampto.sj.ifsc.edu.br:33006/pp02renan'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -39,12 +40,12 @@ Base.prepare(db.engine, reflect=True)
 Usuario = Base.classes.usuario
 # Contato = Base.classes.contato
 # Telefone = Base.classes.telefone
-Emprestimo = Base.classes.emprestimo
-Aluno = Base.classes.alunos
-Equipamento = Base.classes.equipamento
-Semestre = Base.classes.semestre
-Atividade = Base.classes.atividade
-Kit = Base.classes.kit
+EmprestimosDB = Base.classes.Emprestimo
+Aluno = Base.classes.Alunos
+EquipamentoDB = Base.classes.Equipamento
+SemestreDB = Base.classes.Semestre
+AtividadeDB = Base.classes.Atividade
+KitDB = Base.classes.Kit
 
 boostrap = Bootstrap(app)
 fa = FontAwesome(app)
@@ -119,13 +120,12 @@ def efetuar_emprestimo():
             matricula = request.form['matricula']
             idEquipamento = request.form['idEquipamento']
             idAtividade = request.form['idAtividade']
-
             if (db.session.query(Aluno).filter_by(matricula=matricula).first() is not None and
-                    (db.session.query(Kit).filter_by(idKit=idEquipamento).first() is not None or
-                     db.session.query(Equipamento).filter_by(idEquipamento=idEquipamento).first() is not None)):
+                    (db.session.query(KitDB).filter_by(idKit=idEquipamento).first() is not None or
+                     db.session.query(EquipamentoDB).filter_by(idEquipamento=idEquipamento).first() is not None)):
                 auxAluno = db.session.query(Aluno).filter_by(matricula=matricula).first()
 
-                if (db.session.query(Atividade).filter_by(idAtividade=int(idAtividade)).first() is None):
+                if (db.session.query(AtividadeDB).filter_by(idAtividade=int(idAtividade)).first() is None):
                     flash(f"Atividade {idAtividade} é inválida", category="danger")
                     return redirect(url_for('autenticar'))
                 if (auxAluno.temEmprestimo == 1):
@@ -160,8 +160,8 @@ def renovar_emprestimo():
             matricula = request.form['matricula']
             idEmprestimo = request.form['idEmprestimo']
 
-            if (db.session.query(Emprestimo).filter(Emprestimo.idEmprestimo == idEmprestimo).first() is not None):
-                auxEmprestimo = db.session.query(Emprestimo).filter(Emprestimo.idEmprestimo == idEmprestimo).first()
+            if (db.session.query(EmprestimosDB).filter(EmprestimosDB.idEmprestimo == idEmprestimo).first() is not None):
+                auxEmprestimo = db.session.query(EmprestimosDB).filter(EmprestimosDB.idEmprestimo == idEmprestimo).first()
 
                 if (int(auxEmprestimo.matricula) == int(matricula)):
                     auxAluno = db.session.query(Aluno).filter_by(matricula=auxEmprestimo.matricula).first()
@@ -170,7 +170,7 @@ def renovar_emprestimo():
                     else:
                         flash(f"Aluno {auxAluno.matricula} não está ativo no curso", category="danger")
                         return redirect(url_for('autenticar'))
-                    if (auxEmprestimo.quantidadeEmprestimo < 30):
+                    if (auxEmprestimo.quantidadeEmprestimo < 3):
                         pass
                     else:
                         flash(f"Emprestimo {idEmprestimo} já foi renovado 3 vezes", category="danger")
@@ -184,7 +184,7 @@ def renovar_emprestimo():
                     if (int(auxEmprestimo.idAtividade) == 500):
                         dataDevolucao = datetime.now() + timedelta(days=15)
                     else:
-                        semestre = db.session.query(Semestre).filter_by(idSemestre=1).first()
+                        semestre = db.session.query(SemestreDB).filter_by(idSemestre=1).first()
                         dataDevolucao = semestre.ultimoDiaLetivo
                     auxEmprestimo.dataDevolucao = dataDevolucao
                     db.session.commit()
@@ -198,18 +198,17 @@ def renovar_emprestimo():
     return render_template('renovar_emprestimo.html', title='Renovar emprestimo', form=form)
 
 
-
-
 @app.route('/emprestimo/finalizar', methods=['GET', 'POST'])
 def finalizar_emprestimo():
-    print(request.form)
     if session.get('logged_in'):
         form = FinalizarEmprestimoForm()
         if form.validate_on_submit() or request.form.to_dict() != {}:
             idEmprestimo = request.form['idEmprestimo']
-            if (db.session.query(Emprestimo).filter(Emprestimo.idEmprestimo == idEmprestimo).first() is not None):
-                auxEmprestimo = db.session.query(Emprestimo).filter(Emprestimo.idEmprestimo == idEmprestimo).first()
+            if (db.session.query(EmprestimosDB).filter(EmprestimosDB.idEmprestimo == idEmprestimo).first() is not None):
+                auxEmprestimo = db.session.query(EmprestimosDB).filter(EmprestimosDB.idEmprestimo == idEmprestimo).first()
                 auxAluno = db.session.query(Aluno).filter_by(matricula=auxEmprestimo.matricula).first()
+                if(datetime.now() > auxEmprestimo.dataDevolucao):
+                    auxAluno.penalidade = (datetime.now()-auxEmprestimo.dataDevolucao).days
 
                 if (auxAluno.temEmprestimo == 0):
                     flash(f"Aluno {auxAluno.nome} não tem emprestimo", category="danger")
@@ -230,7 +229,7 @@ def finalizar_emprestimo():
 def listar_emprestimos():
     if session.get('logged_in'):
         form = EmprestimoForm()
-        emprestimos = db.session.query(Emprestimo).filter(Emprestimo.dataEntrega == None)
+        emprestimos = db.session.query(EmprestimosDB).filter(EmprestimosDB.dataEntrega == None)
         return render_template('emprestimo_listar.html', emprestimos=emprestimos, form=form)
     return redirect(url_for('autenticar'))
 
@@ -239,15 +238,15 @@ def criarEmprestimo(matricula, idAtividade, idEquipamento):
     if (int(idAtividade) == 500):
         dataDevolucao = dataAgora + timedelta(days=15)
     else:
-        semestre = db.session.query(Semestre).filter_by(idSemestre=1).first()
+        semestre = db.session.query(SemestreDB).filter_by(idSemestre=1).first()
         dataDevolucao = semestre.ultimoDiaLetivo
 
-    emprestimoToCrate = Emprestimo(dataSaida=dataAgora,
-                                   dataDevolucao=dataDevolucao,
-                                   quantidadeEmprestimo=1,
-                                   matricula=matricula,
-                                   idAtividade=idAtividade,
-                                   idEquipamentoEmprestado=idEquipamento)
+    emprestimoToCrate = EmprestimosDB(dataSaida=dataAgora,
+                                      dataDevolucao=dataDevolucao,
+                                      quantidadeEmprestimo=1,
+                                      matricula=matricula,
+                                      idAtividade=idAtividade,
+                                      idEquipamentoEmprestado=idEquipamento)
 
     return emprestimoToCrate
 
