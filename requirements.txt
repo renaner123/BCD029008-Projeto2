@@ -8,3 +8,4 @@ flask-bootstrap
 flask-nav
 Flask-FontAwesome
 pymysql
+flask_sqlalchemy
