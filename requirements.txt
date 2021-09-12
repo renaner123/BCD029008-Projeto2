@@ -8,5 +8,3 @@ flask-bootstrap
 flask-nav
 Flask-FontAwesome
 pymysql
-cryptography
-turbo_flask

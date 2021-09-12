@@ -4,7 +4,7 @@
 
 Desenvolver uma aplicação WEB para um sistema de empréstimos de equipamentos usando Python + Flask e comunicando com banco de dados MySQL. Usando como base o [Projeto 1](https://github.com/BCD29008-classroom/2021-01-projeto-pratico-01-renaner123)
 
-## Funcionalidades implementadas
+### Funcionalidades implementadas
 
 - [x] Efetuar emprestimo
 - [x] Renovar emprestimo
@@ -15,7 +15,7 @@ Desenvolver uma aplicação WEB para um sistema de empréstimos de equipamentos 
 - [x] Modelagem do banco de dados é relacional
 - [x] Conjunto de instruções DDL e DML para criar e povoar a base de dados com nome ddl-dml.sql na raiz do projeto.
 
-## Regras de négocios implementadas
+### Regras de négocios implementadas
 - [x] Somente alunos ativos no curso e sem débitos podem fazer empestimo;
 - [x] Aluno pode fazer somente 1 emprestimo por vez;
 - [x] Prazo para o empréstimo depende da atividade na qual o aluno usará o equipamento;
@@ -27,10 +27,22 @@ Desenvolver uma aplicação WEB para um sistema de empréstimos de equipamentos 
 
 
 
-
 ### Para executar a aplicação
 
+O arquivo [ddl-dml.sql](ddl-dml.sql) tem as instruções DDL e DML para criar o banco. A modelagem feita com o MySQL Workbench está disponível no arquivo [modelagem.mwb](modelagem.mwb).
+
+![diagrama ER](modelagem.png)
+
+As configurações de acesso ao banco MySQL devem ser ajustadas no arquivo [app.py](app.py), precisamente na linha representada abaixo:
+
+```python
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://renan:bcd1234@ampto.sj.ifsc.edu.br:33006/pp02renan'
+```
+
 O ideal é fazer uso do Python Virtualenv, mas seria possível executar a aplicação sem ele. Basta instalar os pacotes que estão no arquivo [requirements.txt.](/requirements.txt)
+
+
+
 
 ```shell
 python3 -m venv venv
@@ -43,6 +55,16 @@ pip install -r requirements.txt
 python3 app.py
 
 ```
+
+## Para acessar a aplicação
+
+No navegador web entre com o endereço `http://localhost:5000`. O banco conta com dois usuários para teste:
+
+| Usuário | Senha |
+| ------- | -----|
+| juca    | 1234 |
+| maria   | 1234 |
+
 
 ## Instruções para fazer emprestimos
 
