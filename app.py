@@ -29,8 +29,7 @@ from forms.finalizarEmprestimo import FinalizarEmprestimoForm
 app = Flask(__name__)
 app.secret_key = "SECRET_KEY"
 
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:123456@127.0.0.1:3306/projeto2'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://renan:bcd1234@ampto.sj.ifsc.edu.br:33006/pp02renan'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:123456@127.0.0.1:3306/projeto2'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
