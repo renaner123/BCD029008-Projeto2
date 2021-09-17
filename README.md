@@ -2,7 +2,7 @@
 
 ### Proposta
 
-Desenvolver uma aplicação WEB para um sistema de empréstimos de equipamentos usando Python + Flask e comunicando com banco de dados MySQL. Usando como base o [Projeto 1](https://github.com/BCD29008-classroom/2021-01-projeto-pratico-01-renaner123)
+Desenvolver uma aplicação WEB para um sistema de empréstimos de equipamentos usando Python + Flask e comunicando com banco de dados MySQL. 
 
 ### Funcionalidades implementadas
 
