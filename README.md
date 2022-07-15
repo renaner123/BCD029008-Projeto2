@@ -1,3 +1,5 @@
+[![Python application](https://github.com/renaner123/BCD029008-Projeto2/actions/workflows/python-app.yml/badge.svg?branch=main)](https://github.com/renaner123/BCD029008-Projeto2/actions/workflows/python-app.yml)
+
 ## Sistema de emprestimos
 
 ### Proposta
